@@ -40,6 +40,20 @@ func NumericDecoderWrapper(value interface{}) pgtype.NumericDecoder {
 	}
 }
 
+func Getter(n pgtype.Numeric) interface{} {
+	if !n.Valid {
+		return nil
+	}
+
+	var d Decimal
+	err := d.DecodeNumeric(&n)
+	if err != nil {
+		panic(err) // Can't happen
+	}
+
+	return decimal.Decimal(d)
+}
+
 // Register registers the shopspring/decimal integration with a pgtype.ConnInfo.
 func Register(ci *pgtype.ConnInfo) {
 	ci.PreferAssignToOverSQLScannerForType(&decimal.Decimal{})
@@ -47,6 +61,7 @@ func Register(ci *pgtype.ConnInfo) {
 	ci.RegisterDataType(pgtype.DataType{
 		Value: &pgtype.Numeric{
 			NumericDecoderWrapper: NumericDecoderWrapper,
+			Getter:                Getter,
 		},
 		Name: "numeric",
 		OID:  pgtype.NumericOID,
