@@ -6,12 +6,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jackc/pgtype"
-	"github.com/jackc/pgtype/testutil"
-	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5/pgtype/testutil"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5"
 	"github.com/shopspring/decimal"
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 )
+
+
+
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_int64_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
@@ -93,6 +96,8 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_int64_100_rows_10_columns(b *testing.
 	}
 }
 
+
+
 func BenchmarkQueryDecode_PG_numeric_to_Go_float64_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
@@ -172,6 +177,8 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_float64_100_rows_10_columns(b *testin
 		}
 	}
 }
+
+
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgtype_Numeric_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
@@ -253,6 +260,8 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_pgtype_Numeric_100_rows_10_columns(b 
 	}
 }
 
+
+
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
@@ -332,6 +341,8 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_100_rows_10_columns(b
 		}
 	}
 }
+
+
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
@@ -413,6 +424,8 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_100_rows_10_colum
 	}
 }
 
+
+
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_Decimal_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
@@ -492,6 +505,8 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_Decimal_100_rows_10_column
 		}
 	}
 }
+
+
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_NullDecimal_1_rows_1_columns(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
@@ -573,11 +588,17 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_NullDecimal_100_rows_10_co
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_1_columns_with_NumericDecoderWrapper(b *testing.B) {
+
+
+
+
+
+
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_1_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [1]decimal.Decimal
@@ -595,11 +616,11 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_1_columns_with
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_10_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_10_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [10]decimal.Decimal
@@ -617,11 +638,11 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_10_columns_wit
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_10_rows_1_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_10_rows_1_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [1]decimal.Decimal
@@ -639,11 +660,11 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_10_rows_1_columns_wit
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_100_rows_10_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_100_rows_10_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [10]decimal.Decimal
@@ -661,11 +682,13 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_100_rows_10_columns_w
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_1_columns_with_NumericDecoderWrapper(b *testing.B) {
+
+
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_1_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [1]decimal.NullDecimal
@@ -683,11 +706,11 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_1_columns_
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_10_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_10_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [10]decimal.NullDecimal
@@ -705,11 +728,11 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_10_columns
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_10_rows_1_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_10_rows_1_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [1]decimal.NullDecimal
@@ -727,11 +750,11 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_10_rows_1_columns
 	}
 }
 
-func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_100_rows_10_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_100_rows_10_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+  pgxdecimal.Register(conn.ConnInfo())
 
 	b.ResetTimer()
 	var v [10]decimal.NullDecimal
@@ -748,3 +771,6 @@ func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_100_rows_10_colum
 		}
 	}
 }
+
+
+

@@ -6,8 +6,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jackc/pgtype/testutil"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5/pgtype/testutil"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5"
 	"github.com/shopspring/decimal"
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 )
@@ -49,7 +50,7 @@ func BenchmarkQueryDecode_PG_<%= pg_type %>_to_Go_<%= go_type.gsub(/\W/, "_") %>
 %>
 <% go_types.each do |go_type| %>
 <% rows_columns.each do |rows, columns| %>
-func BenchmarkQueryDecode_PG_<%= pg_type %>_to_Go_<%= go_type.gsub(/\W/, "_") %>_<%= rows %>_rows_<%= columns %>_columns_with_NumericDecoderWrapper(b *testing.B) {
+func BenchmarkQueryDecode_PG_<%= pg_type %>_to_Go_<%= go_type.gsub(/\W/, "_") %>_<%= rows %>_rows_<%= columns %>_columns_with_Register(b *testing.B) {
 	conn := testutil.MustConnectPgx(b)
 	defer testutil.MustCloseContext(b, conn)
 

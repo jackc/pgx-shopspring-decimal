@@ -3,67 +3,158 @@ package decimal
 import (
 	"fmt"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 )
 
 type Decimal decimal.Decimal
 
-func (d *Decimal) DecodeNumeric(n *pgtype.Numeric) error {
-	if !n.Valid {
-		return fmt.Errorf("cannot decode numeric NULL into %T", d)
+func (d *Decimal) ScanNumeric(v pgtype.Numeric) error {
+	if !v.Valid {
+		return fmt.Errorf("cannot scan NULL into *decimal.Decimal")
 	}
 
-	*d = Decimal(decimal.NewFromBigInt(n.Int, n.Exp))
+	if v.NaN {
+		return fmt.Errorf("cannot scan NaN into *decimal.Decimal")
+	}
+
+	if v.InfinityModifier != pgtype.None {
+		return fmt.Errorf("cannot scan %v into *decimal.Decimal", v.InfinityModifier)
+	}
+
+	*d = Decimal(decimal.New(v.Int.Int64(), v.Exp))
+
 	return nil
+}
+
+func (d Decimal) NumericValue() (pgtype.Numeric, error) {
+	dd := decimal.Decimal(d)
+	return pgtype.Numeric{Int: dd.BigInt(), Exp: dd.Exponent(), Valid: true}, nil
 }
 
 type NullDecimal decimal.NullDecimal
 
-func (d *NullDecimal) DecodeNumeric(n *pgtype.Numeric) error {
-	if n.Valid {
-		*d = NullDecimal{Decimal: decimal.NewFromBigInt(n.Int, n.Exp), Valid: true}
-	} else {
+func (d *NullDecimal) ScanNumeric(v pgtype.Numeric) error {
+	if !v.Valid {
 		*d = NullDecimal{}
+		return nil
 	}
+
+	if v.NaN {
+		return fmt.Errorf("cannot scan NaN into *decimal.NullDecimal")
+	}
+
+	if v.InfinityModifier != pgtype.None {
+		return fmt.Errorf("cannot scan %v into *decimal.NullDecimal", v.InfinityModifier)
+	}
+
+	*d = NullDecimal(decimal.NullDecimal{Decimal: decimal.New(v.Int.Int64(), v.Exp), Valid: true})
+
 	return nil
 }
 
-func NumericDecoderWrapper(value interface{}) pgtype.NumericDecoder {
-	switch value := value.(type) {
-	case *decimal.Decimal:
-		return (*Decimal)(value)
-	case *decimal.NullDecimal:
-		return (*NullDecimal)(value)
-	default:
-		return nil
+func (d NullDecimal) NumericValue() (pgtype.Numeric, error) {
+	if !d.Valid {
+		return pgtype.Numeric{}, nil
 	}
+
+	dd := decimal.Decimal(d.Decimal)
+	return pgtype.Numeric{Int: dd.BigInt(), Exp: dd.Exponent(), Valid: true}, nil
 }
 
-func Getter(n pgtype.Numeric) interface{} {
-	if !n.Valid {
-		return nil
+func TryWrapNumericEncodePlan(value interface{}) (plan pgtype.WrappedEncodePlanNextSetter, nextValue interface{}, ok bool) {
+	switch value := value.(type) {
+	case decimal.Decimal:
+		return &wrapDecimalEncodePlan{}, Decimal(value), true
+	case decimal.NullDecimal:
+		return &wrapNullDecimalEncodePlan{}, NullDecimal(value), true
 	}
 
-	var d Decimal
-	err := d.DecodeNumeric(&n)
+	return nil, nil, false
+}
+
+type wrapDecimalEncodePlan struct {
+	next pgtype.EncodePlan
+}
+
+func (plan *wrapDecimalEncodePlan) SetNext(next pgtype.EncodePlan) { plan.next = next }
+
+func (plan *wrapDecimalEncodePlan) Encode(value interface{}, buf []byte) (newBuf []byte, err error) {
+	return plan.next.Encode(Decimal(value.(decimal.Decimal)), buf)
+}
+
+type wrapNullDecimalEncodePlan struct {
+	next pgtype.EncodePlan
+}
+
+func (plan *wrapNullDecimalEncodePlan) SetNext(next pgtype.EncodePlan) { plan.next = next }
+
+func (plan *wrapNullDecimalEncodePlan) Encode(value interface{}, buf []byte) (newBuf []byte, err error) {
+	return plan.next.Encode(NullDecimal(value.(decimal.NullDecimal)), buf)
+}
+
+func TryWrapNumericScanPlan(target interface{}) (plan pgtype.WrappedScanPlanNextSetter, nextDst interface{}, ok bool) {
+	switch target := target.(type) {
+	case *decimal.Decimal:
+		return &wrapDecimalScanPlan{}, (*Decimal)(target), true
+	case *decimal.NullDecimal:
+		return &wrapNullDecimalScanPlan{}, (*NullDecimal)(target), true
+	}
+
+	return nil, nil, false
+}
+
+type wrapDecimalScanPlan struct {
+	next pgtype.ScanPlan
+}
+
+func (plan *wrapDecimalScanPlan) SetNext(next pgtype.ScanPlan) { plan.next = next }
+
+func (plan *wrapDecimalScanPlan) Scan(src []byte, dst interface{}) error {
+	return plan.next.Scan(src, (*Decimal)(dst.(*decimal.Decimal)))
+}
+
+type wrapNullDecimalScanPlan struct {
+	next pgtype.ScanPlan
+}
+
+func (plan *wrapNullDecimalScanPlan) SetNext(next pgtype.ScanPlan) { plan.next = next }
+
+func (plan *wrapNullDecimalScanPlan) Scan(src []byte, dst interface{}) error {
+	return plan.next.Scan(src, (*NullDecimal)(dst.(*decimal.NullDecimal)))
+}
+
+type NumericCodec struct {
+	pgtype.NumericCodec
+}
+
+func (NumericCodec) DecodeValue(ci *pgtype.ConnInfo, oid uint32, format int16, src []byte) (interface{}, error) {
+	if src == nil {
+		return nil, nil
+	}
+
+	var target decimal.Decimal
+	scanPlan := ci.PlanScan(oid, format, &target)
+	if scanPlan == nil {
+		return nil, fmt.Errorf("PlanScan did not find a plan")
+	}
+
+	err := scanPlan.Scan(src, &target)
 	if err != nil {
-		panic(err) // Can't happen
+		return nil, err
 	}
 
-	return decimal.Decimal(d)
+	return target, nil
 }
 
 // Register registers the shopspring/decimal integration with a pgtype.ConnInfo.
 func Register(ci *pgtype.ConnInfo) {
-	ci.PreferAssignToOverSQLScannerForType(&decimal.Decimal{})
-	ci.PreferAssignToOverSQLScannerForType(&decimal.NullDecimal{})
+	ci.TryWrapEncodePlanFuncs = append([]pgtype.TryWrapEncodePlanFunc{TryWrapNumericEncodePlan}, ci.TryWrapEncodePlanFuncs...)
+	ci.TryWrapScanPlanFuncs = append([]pgtype.TryWrapScanPlanFunc{TryWrapNumericScanPlan}, ci.TryWrapScanPlanFuncs...)
+
 	ci.RegisterDataType(pgtype.DataType{
-		Value: &pgtype.Numeric{
-			NumericDecoderWrapper: NumericDecoderWrapper,
-			Getter:                Getter,
-		},
-		Name: "numeric",
-		OID:  pgtype.NumericOID,
+		Name:  "numeric",
+		OID:   pgtype.NumericOID,
+		Codec: NumericCodec{},
 	})
 }
