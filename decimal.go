@@ -22,7 +22,7 @@ func (d *Decimal) ScanNumeric(v pgtype.Numeric) error {
 		return fmt.Errorf("cannot scan %v into *decimal.Decimal", v.InfinityModifier)
 	}
 
-	*d = Decimal(decimal.New(v.Int.Int64(), v.Exp))
+	*d = Decimal(decimal.NewFromBigInt(v.Int, v.Exp))
 
 	return nil
 }
@@ -48,7 +48,7 @@ func (d *NullDecimal) ScanNumeric(v pgtype.Numeric) error {
 		return fmt.Errorf("cannot scan %v into *decimal.NullDecimal", v.InfinityModifier)
 	}
 
-	*d = NullDecimal(decimal.NullDecimal{Decimal: decimal.New(v.Int.Int64(), v.Exp), Valid: true})
+	*d = NullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromBigInt(v.Int, v.Exp), Valid: true})
 
 	return nil
 }
