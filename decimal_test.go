@@ -14,7 +14,7 @@ func TestCodecDecodeValue(t *testing.T) {
 	conn := testutil.MustConnectPgx(t)
 	defer testutil.MustCloseContext(t, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+	pgxdecimal.Register(conn.TypeMap())
 
 	original := decimal.RequireFromString("1.234")
 
@@ -51,7 +51,7 @@ func TestArray(t *testing.T) {
 	conn := testutil.MustConnectPgx(t)
 	defer testutil.MustCloseContext(t, conn)
 
-	pgxdecimal.Register(conn.ConnInfo())
+	pgxdecimal.Register(conn.TypeMap())
 
 	inputSlice := []decimal.Decimal{}
 

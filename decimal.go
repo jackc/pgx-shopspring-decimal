@@ -18,7 +18,7 @@ func (d *Decimal) ScanNumeric(v pgtype.Numeric) error {
 		return fmt.Errorf("cannot scan NaN into *decimal.Decimal")
 	}
 
-	if v.InfinityModifier != pgtype.None {
+	if v.InfinityModifier != pgtype.Finite {
 		return fmt.Errorf("cannot scan %v into *decimal.Decimal", v.InfinityModifier)
 	}
 
@@ -44,7 +44,7 @@ func (d *NullDecimal) ScanNumeric(v pgtype.Numeric) error {
 		return fmt.Errorf("cannot scan NaN into *decimal.NullDecimal")
 	}
 
-	if v.InfinityModifier != pgtype.None {
+	if v.InfinityModifier != pgtype.Finite {
 		return fmt.Errorf("cannot scan %v into *decimal.NullDecimal", v.InfinityModifier)
 	}
 
@@ -128,13 +128,13 @@ type NumericCodec struct {
 	pgtype.NumericCodec
 }
 
-func (NumericCodec) DecodeValue(ci *pgtype.ConnInfo, oid uint32, format int16, src []byte) (interface{}, error) {
+func (NumericCodec) DecodeValue(tm *pgtype.Map, oid uint32, format int16, src []byte) (interface{}, error) {
 	if src == nil {
 		return nil, nil
 	}
 
 	var target decimal.Decimal
-	scanPlan := ci.PlanScan(oid, format, &target)
+	scanPlan := tm.PlanScan(oid, format, &target)
 	if scanPlan == nil {
 		return nil, fmt.Errorf("PlanScan did not find a plan")
 	}
@@ -148,11 +148,11 @@ func (NumericCodec) DecodeValue(ci *pgtype.ConnInfo, oid uint32, format int16, s
 }
 
 // Register registers the shopspring/decimal integration with a pgtype.ConnInfo.
-func Register(ci *pgtype.ConnInfo) {
-	ci.TryWrapEncodePlanFuncs = append([]pgtype.TryWrapEncodePlanFunc{TryWrapNumericEncodePlan}, ci.TryWrapEncodePlanFuncs...)
-	ci.TryWrapScanPlanFuncs = append([]pgtype.TryWrapScanPlanFunc{TryWrapNumericScanPlan}, ci.TryWrapScanPlanFuncs...)
+func Register(tm *pgtype.Map) {
+	tm.TryWrapEncodePlanFuncs = append([]pgtype.TryWrapEncodePlanFunc{TryWrapNumericEncodePlan}, tm.TryWrapEncodePlanFuncs...)
+	tm.TryWrapScanPlanFuncs = append([]pgtype.TryWrapScanPlanFunc{TryWrapNumericScanPlan}, tm.TryWrapScanPlanFuncs...)
 
-	ci.RegisterDataType(pgtype.DataType{
+	tm.RegisterType(&pgtype.Type{
 		Name:  "numeric",
 		OID:   pgtype.NumericOID,
 		Codec: NumericCodec{},
