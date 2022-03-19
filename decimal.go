@@ -29,7 +29,7 @@ func (d *Decimal) ScanNumeric(v pgtype.Numeric) error {
 
 func (d Decimal) NumericValue() (pgtype.Numeric, error) {
 	dd := decimal.Decimal(d)
-	return pgtype.Numeric{Int: dd.BigInt(), Exp: dd.Exponent(), Valid: true}, nil
+	return pgtype.Numeric{Int: dd.Coefficient(), Exp: dd.Exponent(), Valid: true}, nil
 }
 
 type NullDecimal decimal.NullDecimal
@@ -59,7 +59,7 @@ func (d NullDecimal) NumericValue() (pgtype.Numeric, error) {
 	}
 
 	dd := decimal.Decimal(d.Decimal)
-	return pgtype.Numeric{Int: dd.BigInt(), Exp: dd.Exponent(), Valid: true}, nil
+	return pgtype.Numeric{Int: dd.Coefficient(), Exp: dd.Exponent(), Valid: true}, nil
 }
 
 func TryWrapNumericEncodePlan(value interface{}) (plan pgtype.WrappedEncodePlanNextSetter, nextValue interface{}, ok bool) {

@@ -3,7 +3,7 @@ module github.com/jackc/pgx-shopspring-decimal
 go 1.17
 
 require (
-	github.com/jackc/pgx/v5 v5.0.0-20220227022815-a8f6674a07b2
+	github.com/jackc/pgx/v5 v5.0.0-alpha.1
 	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
 )
