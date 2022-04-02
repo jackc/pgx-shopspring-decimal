@@ -57,6 +57,31 @@ func (d Decimal) Float64Value() (pgtype.Float8, error) {
 	return pgtype.Float8{Float64: dd.InexactFloat64(), Valid: true}, nil
 }
 
+func (d *Decimal) ScanInt64(v pgtype.Int8) error {
+	if !v.Valid {
+		return fmt.Errorf("cannot scan NULL into *decimal.Decimal")
+	}
+
+	*d = Decimal(decimal.NewFromInt(v.Int64))
+
+	return nil
+}
+
+func (d Decimal) Int64Value() (pgtype.Int8, error) {
+	dd := decimal.Decimal(d)
+
+	if !dd.IsInteger() {
+		return pgtype.Int8{}, fmt.Errorf("cannot convert %v to int64", dd)
+	}
+
+	bi := dd.BigInt()
+	if !bi.IsInt64() {
+		return pgtype.Int8{}, fmt.Errorf("cannot convert %v to int64", dd)
+	}
+
+	return pgtype.Int8{Int64: bi.Int64(), Valid: true}, nil
+}
+
 type NullDecimal decimal.NullDecimal
 
 func (d *NullDecimal) ScanNumeric(v pgtype.Numeric) error {
@@ -113,6 +138,36 @@ func (d NullDecimal) Float64Value() (pgtype.Float8, error) {
 
 	dd := decimal.NullDecimal(d)
 	return pgtype.Float8{Float64: dd.Decimal.InexactFloat64(), Valid: true}, nil
+}
+
+func (d *NullDecimal) ScanInt64(v pgtype.Int8) error {
+	if !v.Valid {
+		*d = NullDecimal{}
+		return nil
+	}
+
+	*d = NullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromInt(v.Int64), Valid: true})
+
+	return nil
+}
+
+func (d NullDecimal) Int64Value() (pgtype.Int8, error) {
+	if !d.Valid {
+		return pgtype.Int8{}, nil
+	}
+
+	dd := decimal.NullDecimal(d).Decimal
+
+	if !dd.IsInteger() {
+		return pgtype.Int8{}, fmt.Errorf("cannot convert %v to int64", dd)
+	}
+
+	bi := dd.BigInt()
+	if !bi.IsInt64() {
+		return pgtype.Int8{}, fmt.Errorf("cannot convert %v to int64", dd)
+	}
+
+	return pgtype.Int8{Int64: bi.Int64(), Valid: true}, nil
 }
 
 func TryWrapNumericEncodePlan(value interface{}) (plan pgtype.WrappedEncodePlanNextSetter, nextValue interface{}, ok bool) {

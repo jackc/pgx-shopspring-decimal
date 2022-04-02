@@ -2,6 +2,7 @@ package decimal_test
 
 import (
 	"context"
+	"math"
 	"testing"
 
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
@@ -213,6 +214,61 @@ func TestValueRoundTripFloat8(t *testing.T) {
 			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-123456.123456"), Valid: true},
 			Result: new(decimal.NullDecimal),
 			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-123456.123456"), Valid: true}),
+		},
+	})
+}
+
+func TestValueRoundTripInt8(t *testing.T) {
+	pgxtest.RunValueRoundTripTests(context.Background(), t, defaultConnTestRunner, nil, "int8", []pgxtest.ValueRoundTripTest{
+		{
+			Param:  decimal.NewFromInt(0),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.NewFromInt(0)),
+		},
+		{
+			Param:  decimal.NewFromInt(1),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.NewFromInt(1)),
+		},
+		{
+			Param:  decimal.NewFromInt(math.MaxInt64),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.NewFromInt(math.MaxInt64)),
+		},
+		{
+			Param:  decimal.NewFromInt(-1),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.NewFromInt(-1)),
+		},
+		{
+			Param:  decimal.NewFromInt(math.MinInt64),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.NewFromInt(math.MinInt64)),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.NewFromInt(0), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromInt(0), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.NewFromInt(1), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromInt(1), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.NewFromInt(math.MaxInt64), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromInt(math.MaxInt64), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.NewFromInt(-1), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromInt(-1), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.NewFromInt(math.MinInt64), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromInt(math.MinInt64), Valid: true}),
 		},
 	})
 }

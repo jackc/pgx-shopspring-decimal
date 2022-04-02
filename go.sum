@@ -9,6 +9,8 @@ github.com/jackc/pgx/v5 v5.0.0-alpha.1 h1:6+kXNvlwgkpfPOaDfy7YLWVx4OMi0xhJL2kakN
 github.com/jackc/pgx/v5 v5.0.0-alpha.1/go.mod h1:hpqr/HW4qanKY/8S2BFVFWYaOpch/IjnvAAt6YdntZQ=
 github.com/jackc/pgx/v5 v5.0.0-alpha.1.0.20220402194133-53ec52aa174c h1:QJXOyTMAw0RuPWx/mBO2lB+6kI3ncpKMy3J4o1HeOHA=
 github.com/jackc/pgx/v5 v5.0.0-alpha.1.0.20220402194133-53ec52aa174c/go.mod h1:hpqr/HW4qanKY/8S2BFVFWYaOpch/IjnvAAt6YdntZQ=
+github.com/jackc/pgx/v5 v5.0.0-alpha.1.0.20220402215505-8cf6721d6672 h1:n6d8fVEARY8cw0D7l/lpZlhF5FnSLixnByz0TiZEu/c=
+github.com/jackc/pgx/v5 v5.0.0-alpha.1.0.20220402215505-8cf6721d6672/go.mod h1:hpqr/HW4qanKY/8S2BFVFWYaOpch/IjnvAAt6YdntZQ=
 github.com/jackc/puddle v1.2.1/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
