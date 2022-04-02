@@ -9,742 +9,689 @@ import (
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/jackc/pgx/v5/pgtype/testutil"
 	"github.com/shopspring/decimal"
 )
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_int64_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]int64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]int64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_int64_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]int64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]int64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_int64_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]int64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]int64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_int64_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]int64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]int64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_float64_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]float64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]float64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_float64_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]float64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]float64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_float64_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]float64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]float64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_float64_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]float64
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]float64
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgtype_Numeric_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]pgtype.Numeric
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]pgtype.Numeric
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgtype_Numeric_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]pgtype.Numeric
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]pgtype.Numeric
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgtype_Numeric_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]pgtype.Numeric
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]pgtype.Numeric
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgtype_Numeric_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]pgtype.Numeric
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]pgtype.Numeric
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_Decimal_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]pgxdecimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]pgxdecimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_Decimal_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]pgxdecimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]pgxdecimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_Decimal_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]pgxdecimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]pgxdecimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_Decimal_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]pgxdecimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]pgxdecimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_NullDecimal_1_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]pgxdecimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]pgxdecimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_NullDecimal_1_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]pgxdecimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]pgxdecimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_NullDecimal_10_rows_1_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [1]pgxdecimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]pgxdecimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_pgxdecimal_NullDecimal_100_rows_10_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [10]pgxdecimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]pgxdecimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				ctx,
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_1_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [1]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_1_rows_10_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [10]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_10_rows_1_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [1]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_Decimal_100_rows_10_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [10]decimal.Decimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.Decimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_1_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [1]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_1_rows_10_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [10]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 1) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_10_rows_1_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [1]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0 from generate_series(1, 10) n`,
-			nil,
-			[]interface{}{&v[0]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [1]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0 from generate_series(1, 10) n`,
+				nil,
+				[]interface{}{&v[0]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }
 
 func BenchmarkQueryDecode_PG_numeric_to_Go_decimal_NullDecimal_100_rows_10_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [10]decimal.NullDecimal
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
-			nil,
-			[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+		b.ResetTimer()
+		var v [10]decimal.NullDecimal
+		for i := 0; i < b.N; i++ {
+			_, err := conn.QueryFunc(
+				context.Background(),
+				`select n::numeric + 0, n::numeric + 1, n::numeric + 2, n::numeric + 3, n::numeric + 4, n::numeric + 5, n::numeric + 6, n::numeric + 7, n::numeric + 8, n::numeric + 9 from generate_series(1, 100) n`,
+				nil,
+				[]interface{}{&v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8], &v[9]},
+				func(pgx.QueryFuncRow) error { return nil },
+			)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }

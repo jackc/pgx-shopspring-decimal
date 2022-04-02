@@ -6,7 +6,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jackc/pgx/v5/pgtype/testutil"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5"
 	"github.com/shopspring/decimal"
@@ -21,23 +20,22 @@ import (
 <% go_types.each do |go_type| %>
 <% rows_columns.each do |rows, columns| %>
 func BenchmarkQueryDecode_PG_<%= pg_type %>_to_Go_<%= go_type.gsub(/\W/, "_") %>_<%= rows %>_rows_<%= columns %>_columns(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-	b.ResetTimer()
-	var v [<%= columns %>]<%= go_type %>
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select <% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>n::<%= pg_type %> + <%= col_idx%><% end %> from generate_series(1, <%= rows %>) n`,
-			nil,
-			[]interface{}{<% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>&v[<%= col_idx%>]<% end %>},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+    b.ResetTimer()
+    var v [<%= columns %>]<%= go_type %>
+    for i := 0; i < b.N; i++ {
+      _, err := conn.QueryFunc(
+        ctx,
+        `select <% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>n::<%= pg_type %> + <%= col_idx%><% end %> from generate_series(1, <%= rows %>) n`,
+        nil,
+        []interface{}{<% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>&v[<%= col_idx%>]<% end %>},
+        func(pgx.QueryFuncRow) error { return nil },
+      )
+      if err != nil {
+        b.Fatal(err)
+      }
+    }
+  })
 }
 <% end %>
 <% end %>
@@ -51,25 +49,22 @@ func BenchmarkQueryDecode_PG_<%= pg_type %>_to_Go_<%= go_type.gsub(/\W/, "_") %>
 <% go_types.each do |go_type| %>
 <% rows_columns.each do |rows, columns| %>
 func BenchmarkQueryDecode_PG_<%= pg_type %>_to_Go_<%= go_type.gsub(/\W/, "_") %>_<%= rows %>_rows_<%= columns %>_columns_with_Register(b *testing.B) {
-	conn := testutil.MustConnectPgx(b)
-	defer testutil.MustCloseContext(b, conn)
-
-  pgxdecimal.Register(conn.TypeMap())
-
-	b.ResetTimer()
-	var v [<%= columns %>]<%= go_type %>
-	for i := 0; i < b.N; i++ {
-		_, err := conn.QueryFunc(
-			context.Background(),
-			`select <% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>n::<%= pg_type %> + <%= col_idx%><% end %> from generate_series(1, <%= rows %>) n`,
-			nil,
-			[]interface{}{<% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>&v[<%= col_idx%>]<% end %>},
-			func(pgx.QueryFuncRow) error { return nil },
-		)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
+	defaultConnTestRunner.RunTest(context.Background(), b, func(ctx context.Context, _ testing.TB, conn *pgx.Conn) {
+    b.ResetTimer()
+    var v [<%= columns %>]<%= go_type %>
+    for i := 0; i < b.N; i++ {
+      _, err := conn.QueryFunc(
+        context.Background(),
+        `select <% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>n::<%= pg_type %> + <%= col_idx%><% end %> from generate_series(1, <%= rows %>) n`,
+        nil,
+        []interface{}{<% columns.times do |col_idx| %><% if col_idx != 0 %>, <% end %>&v[<%= col_idx%>]<% end %>},
+        func(pgx.QueryFuncRow) error { return nil },
+      )
+      if err != nil {
+        b.Fatal(err)
+      }
+    }
+  })
 }
 <% end %>
 <% end %>

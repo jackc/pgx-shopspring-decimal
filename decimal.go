@@ -2,6 +2,7 @@ package decimal
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
@@ -148,13 +149,41 @@ func (NumericCodec) DecodeValue(tm *pgtype.Map, oid uint32, format int16, src []
 }
 
 // Register registers the shopspring/decimal integration with a pgtype.ConnInfo.
-func Register(tm *pgtype.Map) {
-	tm.TryWrapEncodePlanFuncs = append([]pgtype.TryWrapEncodePlanFunc{TryWrapNumericEncodePlan}, tm.TryWrapEncodePlanFuncs...)
-	tm.TryWrapScanPlanFuncs = append([]pgtype.TryWrapScanPlanFunc{TryWrapNumericScanPlan}, tm.TryWrapScanPlanFuncs...)
+func Register(m *pgtype.Map) {
+	m.TryWrapEncodePlanFuncs = append([]pgtype.TryWrapEncodePlanFunc{TryWrapNumericEncodePlan}, m.TryWrapEncodePlanFuncs...)
+	m.TryWrapScanPlanFuncs = append([]pgtype.TryWrapScanPlanFunc{TryWrapNumericScanPlan}, m.TryWrapScanPlanFuncs...)
 
-	tm.RegisterType(&pgtype.Type{
+	m.RegisterType(&pgtype.Type{
 		Name:  "numeric",
 		OID:   pgtype.NumericOID,
 		Codec: NumericCodec{},
 	})
+
+	registerDefaultPgTypeVariants := func(name, arrayName string, value interface{}) {
+		// T
+		m.RegisterDefaultPgType(value, name)
+
+		// *T
+		valueType := reflect.TypeOf(value)
+		m.RegisterDefaultPgType(reflect.New(valueType).Interface(), name)
+
+		// []T
+		sliceType := reflect.SliceOf(valueType)
+		m.RegisterDefaultPgType(reflect.MakeSlice(sliceType, 0, 0).Interface(), arrayName)
+
+		// *[]T
+		m.RegisterDefaultPgType(reflect.New(sliceType).Interface(), arrayName)
+
+		// []*T
+		sliceOfPointerType := reflect.SliceOf(reflect.TypeOf(reflect.New(valueType).Interface()))
+		m.RegisterDefaultPgType(reflect.MakeSlice(sliceOfPointerType, 0, 0).Interface(), arrayName)
+
+		// *[]*T
+		m.RegisterDefaultPgType(reflect.New(sliceOfPointerType).Interface(), arrayName)
+	}
+
+	registerDefaultPgTypeVariants("numeric", "_numeric", decimal.Decimal{})
+	registerDefaultPgTypeVariants("numeric", "_numeric", decimal.NullDecimal{})
+	registerDefaultPgTypeVariants("numeric", "_numeric", Decimal{})
+	registerDefaultPgTypeVariants("numeric", "_numeric", NullDecimal{})
 }

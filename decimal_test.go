@@ -5,67 +5,149 @@ import (
 	"testing"
 
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
-	"github.com/jackc/pgx/v5/pgtype/testutil"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxtest"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
+var defaultConnTestRunner pgxtest.ConnTestRunner
+
+func init() {
+	defaultConnTestRunner = pgxtest.DefaultConnTestRunner()
+	defaultConnTestRunner.AfterConnect = func(ctx context.Context, t testing.TB, conn *pgx.Conn) {
+		pgxdecimal.Register(conn.TypeMap())
+	}
+}
+
 func TestCodecDecodeValue(t *testing.T) {
-	conn := testutil.MustConnectPgx(t)
-	defer testutil.MustCloseContext(t, conn)
+	defaultConnTestRunner.RunTest(context.Background(), t, func(ctx context.Context, t testing.TB, conn *pgx.Conn) {
+		original := decimal.RequireFromString("1.234")
 
-	pgxdecimal.Register(conn.TypeMap())
-
-	original := decimal.RequireFromString("1.234")
-
-	rows, err := conn.Query(context.Background(), `select $1::numeric`, original)
-	require.NoError(t, err)
-
-	for rows.Next() {
-		values, err := rows.Values()
+		rows, err := conn.Query(context.Background(), `select $1::numeric`, original)
 		require.NoError(t, err)
 
-		require.Len(t, values, 1)
-		v0, ok := values[0].(decimal.Decimal)
-		require.True(t, ok)
-		require.Equal(t, original, v0)
-	}
+		for rows.Next() {
+			values, err := rows.Values()
+			require.NoError(t, err)
 
-	require.NoError(t, rows.Err())
+			require.Len(t, values, 1)
+			v0, ok := values[0].(decimal.Decimal)
+			require.True(t, ok)
+			require.Equal(t, original, v0)
+		}
 
-	rows, err = conn.Query(context.Background(), `select $1::numeric`, nil)
-	require.NoError(t, err)
+		require.NoError(t, rows.Err())
 
-	for rows.Next() {
-		values, err := rows.Values()
+		rows, err = conn.Query(context.Background(), `select $1::numeric`, nil)
 		require.NoError(t, err)
 
-		require.Len(t, values, 1)
-		require.Equal(t, nil, values[0])
-	}
+		for rows.Next() {
+			values, err := rows.Values()
+			require.NoError(t, err)
 
-	require.NoError(t, rows.Err())
+			require.Len(t, values, 1)
+			require.Equal(t, nil, values[0])
+		}
+
+		require.NoError(t, rows.Err())
+	})
 }
 
 func TestArray(t *testing.T) {
-	conn := testutil.MustConnectPgx(t)
-	defer testutil.MustCloseContext(t, conn)
+	defaultConnTestRunner.RunTest(context.Background(), t, func(ctx context.Context, t testing.TB, conn *pgx.Conn) {
+		inputSlice := []decimal.Decimal{}
 
-	pgxdecimal.Register(conn.TypeMap())
+		for i := 0; i < 10; i++ {
+			d := decimal.NewFromInt(int64(i))
+			inputSlice = append(inputSlice, d)
+		}
 
-	inputSlice := []decimal.Decimal{}
+		var outputSlice []decimal.Decimal
+		err := conn.QueryRow(context.Background(), `select $1::numeric[]`, inputSlice).Scan(&outputSlice)
+		require.NoError(t, err)
 
-	for i := 0; i < 10; i++ {
-		d := decimal.NewFromInt(int64(i))
-		inputSlice = append(inputSlice, d)
+		require.Equal(t, len(inputSlice), len(outputSlice))
+		for i := 0; i < len(inputSlice); i++ {
+			require.True(t, outputSlice[i].Equal(inputSlice[i]))
+		}
+	})
+}
+
+func isExpectedEqDecimal(a decimal.Decimal) func(interface{}) bool {
+	return func(v interface{}) bool {
+		return a.Equal(v.(decimal.Decimal))
 	}
+}
 
-	var outputSlice []decimal.Decimal
-	err := conn.QueryRow(context.Background(), `select $1::numeric[]`, inputSlice).Scan(&outputSlice)
-	require.NoError(t, err)
-
-	require.Equal(t, len(inputSlice), len(outputSlice))
-	for i := 0; i < len(inputSlice); i++ {
-		require.True(t, outputSlice[i].Equal(inputSlice[i]))
+func isExpectedEqNullDecimal(a decimal.NullDecimal) func(interface{}) bool {
+	return func(v interface{}) bool {
+		b := v.(decimal.NullDecimal)
+		return a.Valid == b.Valid && a.Decimal.Equal(b.Decimal)
 	}
+}
+
+func TestValueRoundTrip(t *testing.T) {
+	pgxtest.RunValueRoundTripTests(context.Background(), t, defaultConnTestRunner, nil, "numeric", []pgxtest.ValueRoundTripTest{
+		{
+			Param:  decimal.RequireFromString("1"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("1")),
+		},
+		{
+			Param:  decimal.RequireFromString("0.000012345"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("0.000012345")),
+		},
+		{
+			Param:  decimal.RequireFromString("123456.123456"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("123456.123456")),
+		},
+		{
+			Param:  decimal.RequireFromString("-1"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("-1")),
+		},
+		{
+			Param:  decimal.RequireFromString("-0.000012345"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("-0.000012345")),
+		},
+		{
+			Param:  decimal.RequireFromString("-123456.123456"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("-123456.123456")),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("1"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("1"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("0.000012345"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("0.000012345"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("123456.123456"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("123456.123456"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-1"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-1"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-0.000012345"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-0.000012345"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-123456.123456"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-123456.123456"), Valid: true}),
+		},
+	})
 }
