@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/jackc/pgx/v5 v5.0.0-alpha.1.0.20220402194133-53ec52aa174c
-	github.com/shopspring/decimal v1.2.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.7.0
 )
 

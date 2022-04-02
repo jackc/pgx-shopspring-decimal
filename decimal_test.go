@@ -151,3 +151,68 @@ func TestValueRoundTrip(t *testing.T) {
 		},
 	})
 }
+
+func TestValueRoundTripFloat8(t *testing.T) {
+	pgxtest.RunValueRoundTripTests(context.Background(), t, defaultConnTestRunner, nil, "float8", []pgxtest.ValueRoundTripTest{
+		{
+			Param:  decimal.RequireFromString("1"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("1")),
+		},
+		{
+			Param:  decimal.RequireFromString("0.000012345"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("0.000012345")),
+		},
+		{
+			Param:  decimal.RequireFromString("123456.123456"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("123456.123456")),
+		},
+		{
+			Param:  decimal.RequireFromString("-1"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("-1")),
+		},
+		{
+			Param:  decimal.RequireFromString("-0.000012345"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("-0.000012345")),
+		},
+		{
+			Param:  decimal.RequireFromString("-123456.123456"),
+			Result: new(decimal.Decimal),
+			Test:   isExpectedEqDecimal(decimal.RequireFromString("-123456.123456")),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("1"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("1"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("0.000012345"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("0.000012345"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("123456.123456"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("123456.123456"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-1"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-1"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-0.000012345"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-0.000012345"), Valid: true}),
+		},
+		{
+			Param:  decimal.NullDecimal{Decimal: decimal.RequireFromString("-123456.123456"), Valid: true},
+			Result: new(decimal.NullDecimal),
+			Test:   isExpectedEqNullDecimal(decimal.NullDecimal{Decimal: decimal.RequireFromString("-123456.123456"), Valid: true}),
+		},
+	})
+}

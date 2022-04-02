@@ -2,6 +2,7 @@ package decimal
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -33,6 +34,29 @@ func (d Decimal) NumericValue() (pgtype.Numeric, error) {
 	return pgtype.Numeric{Int: dd.Coefficient(), Exp: dd.Exponent(), Valid: true}, nil
 }
 
+func (d *Decimal) ScanFloat64(v pgtype.Float8) error {
+	if !v.Valid {
+		return fmt.Errorf("cannot scan NULL into *decimal.Decimal")
+	}
+
+	if math.IsNaN(v.Float64) {
+		return fmt.Errorf("cannot scan NaN into *decimal.Decimal")
+	}
+
+	if math.IsInf(v.Float64, 0) {
+		return fmt.Errorf("cannot scan %v into *decimal.Decimal", v.Float64)
+	}
+
+	*d = Decimal(decimal.NewFromFloat(v.Float64))
+
+	return nil
+}
+
+func (d Decimal) Float64Value() (pgtype.Float8, error) {
+	dd := decimal.Decimal(d)
+	return pgtype.Float8{Float64: dd.InexactFloat64(), Valid: true}, nil
+}
+
 type NullDecimal decimal.NullDecimal
 
 func (d *NullDecimal) ScanNumeric(v pgtype.Numeric) error {
@@ -61,6 +85,34 @@ func (d NullDecimal) NumericValue() (pgtype.Numeric, error) {
 
 	dd := decimal.Decimal(d.Decimal)
 	return pgtype.Numeric{Int: dd.Coefficient(), Exp: dd.Exponent(), Valid: true}, nil
+}
+
+func (d *NullDecimal) ScanFloat64(v pgtype.Float8) error {
+	if !v.Valid {
+		*d = NullDecimal{}
+		return nil
+	}
+
+	if math.IsNaN(v.Float64) {
+		return fmt.Errorf("cannot scan NaN into *decimal.NullDecimal")
+	}
+
+	if math.IsInf(v.Float64, 0) {
+		return fmt.Errorf("cannot scan %v into *decimal.NullDecimal", v.Float64)
+	}
+
+	*d = NullDecimal(decimal.NullDecimal{Decimal: decimal.NewFromFloat(v.Float64), Valid: true})
+
+	return nil
+}
+
+func (d NullDecimal) Float64Value() (pgtype.Float8, error) {
+	if !d.Valid {
+		return pgtype.Float8{}, nil
+	}
+
+	dd := decimal.NullDecimal(d)
+	return pgtype.Float8{Float64: dd.Decimal.InexactFloat64(), Valid: true}, nil
 }
 
 func TryWrapNumericEncodePlan(value interface{}) (plan pgtype.WrappedEncodePlanNextSetter, nextValue interface{}, ok bool) {
