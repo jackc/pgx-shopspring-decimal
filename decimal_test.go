@@ -55,6 +55,14 @@ func TestCodecDecodeValue(t *testing.T) {
 	})
 }
 
+func TestNaN(t *testing.T) {
+	defaultConnTestRunner.RunTest(context.Background(), t, func(ctx context.Context, t testing.TB, conn *pgx.Conn) {
+		var d decimal.Decimal
+		err := conn.QueryRow(context.Background(), `select 'NaN'::numeric`).Scan(&d)
+		require.EqualError(t, err, `can't scan into dest[0]: cannot scan NaN into *decimal.Decimal`)
+	})
+}
+
 func TestArray(t *testing.T) {
 	defaultConnTestRunner.RunTest(context.Background(), t, func(ctx context.Context, t testing.TB, conn *pgx.Conn) {
 		inputSlice := []decimal.Decimal{}
